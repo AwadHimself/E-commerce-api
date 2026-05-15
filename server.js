@@ -6,8 +6,10 @@ dotenv.config({ path: "config.env" });
 
 const app = express();
 
+const apiError = require("./utils/apiError");
 const dbConnection = require("./config/database");
 const CategoryRoute = require("./routes/category.routes");
+const globalError = require("./middlewares/errorMiddleware");
 
 dbConnection();
 
@@ -25,8 +27,24 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/categories", CategoryRoute);
 
+app.use((req, res, next) => {
+  next(new apiError("This route is not defined", 404));
+});
+
+//global error handlig middleware inside express
+app.use(globalError);
+
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`app running on port ${PORT}`);
+});
+
+//handle errors outside express
+process.on("unhandledRejection", (err) => {
+  console.error(`UnhandledRejection Errors : ${err.name} | ${err.message}`);
+  server.close(() => {
+    console.error("Shutting Down....");
+    process.exit(1);
+  });
 });

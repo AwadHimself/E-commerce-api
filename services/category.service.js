@@ -1,6 +1,7 @@
 const CategoryModel = require("../models/categoryModel");
 var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
+const apiError = require("../utils/apiError");
 
 //get list of categories
 //@route GET /api/v1/categories
@@ -16,11 +17,11 @@ const getCategories = asyncHandler(async (req, res) => {
 //get category by id
 //@route GET /api/v1/categories/:id
 //@access Public
-const getCategory = asyncHandler(async (req, res) => {
+const getCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await CategoryModel.findById(id);
   if (!category) {
-    res.status(404).json({ msg: `No Category For This Id ${id}` });
+    return next(new apiError(`No Category For This Id ${id}`, 404));
   }
   res.status(200).json({ data: category });
 });
@@ -28,7 +29,7 @@ const getCategory = asyncHandler(async (req, res) => {
 //Update category by id
 //@route put /api/v1/categories/:id
 //@access private
-const updateCategory = asyncHandler(async (req, res) => {
+const updateCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
   const category = await CategoryModel.findByIdAndUpdate(
@@ -40,7 +41,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     { new: true },
   );
   if (!category) {
-    res.status(404).json({ msg: `No Category For This Id ${id}` });
+    next(new apiError(`No Category For This Id ${id}`, 404));
   }
   res.status(200).json({ data: category });
 });
@@ -57,13 +58,13 @@ const createCategory = asyncHandler(async (req, res) => {
 //delete category
 //@route DELETE /api/v1/categories/:id
 //@access private
-const deleteCategory = asyncHandler(async (req, res) => {
+const deleteCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await CategoryModel.findByIdAndDelete(id);
   if (!category) {
-    res.status(404).json({ msg: `No Category For This Id ${id}` });
+    return next(new apiError(`No Category For This Id ${id}`, 404));
   }
-  res.status(204);
+  res.status(204).send();
 });
 
 module.exports = {
