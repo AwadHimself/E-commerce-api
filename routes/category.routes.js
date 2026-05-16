@@ -17,6 +17,9 @@ const {
 
 const { param, validationResult } = require("express-validator");
 
+const subCategoriesRoute = require("./subCategory.routes");
+router.use("/:categoryId/subcategories", subCategoriesRoute);
+
 router
   .route("/")
   .get(getCategories)
