@@ -5,10 +5,10 @@ const brandySchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Brandy Required"],
-      unique: [true, "Brandy Must Be Unique"],
-      minlength: [3, "Brandy Name Is Too Short"],
-      maxlength: [32, "Brandy Name Is Too long"],
+      required: [true, "Brand Required"],
+      unique: [true, "Brand Must Be Unique"],
+      minlength: [3, "Brand Name Is Too Short"],
+      maxlength: [32, "Brand Name Is Too long"],
     },
     slug: {
       type: String,

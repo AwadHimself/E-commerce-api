@@ -11,6 +11,7 @@ const dbConnection = require("./config/database");
 const CategoryRoute = require("./routes/category.routes");
 const brandRoute = require("./routes/brand.routes");
 const SubCategoryRoute = require("./routes/subCategory.routes");
+const productRoutes = require("./routes/product.routes");
 const globalError = require("./middlewares/errorMiddleware");
 
 dbConnection();
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/categories", CategoryRoute);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/subcategories", SubCategoryRoute);
+app.use("/api/v1/products", productRoutes);
 
 app.use((req, res, next) => {
   next(new apiError("This route is not defined", 404));
