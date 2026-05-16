@@ -9,6 +9,7 @@ const app = express();
 const apiError = require("./utils/apiError");
 const dbConnection = require("./config/database");
 const CategoryRoute = require("./routes/category.routes");
+const brandRoute = require("./routes/brand.routes");
 const SubCategoryRoute = require("./routes/subCategory.routes");
 const globalError = require("./middlewares/errorMiddleware");
 
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/categories", CategoryRoute);
+app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/subcategories", SubCategoryRoute);
 
 app.use((req, res, next) => {
