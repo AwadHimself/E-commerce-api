@@ -5,6 +5,7 @@ const morgan = require("morgan");
 dotenv.config({ path: "config.env" });
 
 const app = express();
+app.set("query parser", "extended");
 
 const apiError = require("./utils/apiError");
 const dbConnection = require("./config/database");

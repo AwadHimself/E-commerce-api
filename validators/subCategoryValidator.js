@@ -14,11 +14,6 @@ const createSubCategoryValidator = [
     .withMessage(
       "SubCategory Name Must Be Longer Than 3 And Less Than 32 Characters",
     ),
-  check("category")
-    .isMongoId()
-    .withMessage("Invalid Category Id")
-    .notEmpty()
-    .whitelist("SubCategory must be belong to a category"),
   validatorMiddleware,
 ];
 

@@ -43,21 +43,32 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 //create subCategory
 //@route POST /api/v1/subcategories
 //@access private
+const mongoose = require("mongoose");
+
 const createSubCategory = asyncHandler(async (req, res, next) => {
   const { name, category } = req.body;
 
-  // 1. Check if category exists
+  console.log(category);
+
+  // Validate ObjectId first
+  if (!mongoose.Types.ObjectId.isValid(category)) {
+    return next(new apiError(`Invalid Category Id: ${category}`, 400));
+  }
+
+  // Check if category exists
   const foundCategory = await Category.findById(category);
 
   if (!foundCategory) {
     return next(new apiError(`No Category For This Id ${category}`, 404));
   }
-  // 2. Create subcategory
+
+  // Create subcategory
   const subCategory = await SubCategory.create({
     name,
     slug: slugify(name),
     category,
   });
+
   res.status(201).json({ data: subCategory });
 });
 

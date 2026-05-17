@@ -2,20 +2,28 @@ const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
 var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
+const APIFeatures = require("../utils/apiFeatures");
 const apiError = require("../utils/apiError");
 
 //get list of Products
 //@route GET /api/v1/products
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
-  const products = await Product.find().skip(skip).limit(limit).populate({
-    path: "category",
-    select: "name , id",
+  const features = new APIFeatures(Product.find(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  // 9) EXECUTE QUERY
+  const products = await features.query;
+
+  // 10) RESPONSE
+  res.status(200).json({
+    results: products.length,
+    data: products,
   });
-  res.status(200).json({ results: products.length, page, data: products });
 });
 
 //get product by id
