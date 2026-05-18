@@ -4,24 +4,30 @@ var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const APIFeatures = require("../utils/apiFeatures");
 const apiError = require("../utils/apiError");
+const factory = require("./handlerFactory");
 
 //get list of Products
 //@route GET /api/v1/products
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
+  //build Query
+  const countDocuments = await Product.countDocuments();
   const features = new APIFeatures(Product.find(), req.query)
     .filter()
     .search()
     .sort()
     .limitFields()
-    .paginate();
+    .paginate(countDocuments);
+
+  const { query, paginationResult } = features;
 
   // 9) EXECUTE QUERY
-  const products = await features.query;
+  const products = await query;
 
   // 10) RESPONSE
   res.status(200).json({
     results: products.length,
+    paginationResult,
     data: products,
   });
 });
@@ -44,17 +50,7 @@ const getProduct = asyncHandler(async (req, res, next) => {
 //Update Product by id
 //@route put /api/v1/products/:id
 //@access private
-const updateProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (req.aborted.title) {
-    req.body.slug = slugify(req.body.title);
-  }
-  const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
-  if (!product) {
-    next(new apiError(`No Product For This Id ${id}`, 404));
-  }
-  res.status(200).json({ data: product });
-});
+const updateProduct = factory.updateOne(Product);
 
 //create Product
 //@route POST /api/v1/products
@@ -76,17 +72,11 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({ data: product });
 });
+
 //delete product
 //@route DELETE /api/v1/products/:id
 //@access private
-const deleteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await Product.findByIdAndDelete(id);
-  if (!product) {
-    return next(new apiError(`No Product For This Id ${id}`, 404));
-  }
-  res.status(204).send();
-});
+const deleteProduct = factory.deleteOne(Product);
 
 module.exports = {
   getProducts,

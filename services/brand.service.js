@@ -2,16 +2,28 @@ const Brand = require("../models/brandModel");
 var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const apiError = require("../utils/apiError");
+const APIFeatures = require("../utils/apiFeatures");
+const factory = require("./handlerFactory");
 
 //get list of Brands
 //@route GET /api/v1/Brands
 //@access Public
 const getBrands = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
-  const brand = await Brand.find().skip(skip).limit(limit);
-  res.status(200).json({ results: brand.length, page, data: brand });
+  //build Query
+  const countDocuments = await Brand.countDocuments();
+  const features = new APIFeatures(Brand.find(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .limitFields()
+    .paginate(countDocuments);
+
+  const { query, paginationResult } = features;
+
+  const brand = await query;
+  res
+    .status(200)
+    .json({ results: brand.length, paginationResult, data: brand });
 });
 
 //get Brand by id
@@ -29,45 +41,15 @@ const getBrand = asyncHandler(async (req, res, next) => {
 //Update Brand by id
 //@route put /api/v1/categories/:id
 //@access private
-const updateBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-
-  const brand = await Brand.findByIdAndUpdate(
-    id,
-    {
-      name,
-      slug: slugify(name),
-    },
-    { new: true },
-  );
-
-  if (!brand) {
-    return next(new apiError(`No Brand For This Id ${id}`, 404));
-  }
-
-  res.status(200).json({ data: brand });
-});
+const updateBrand = factory.updateOne(Brand);
 //create Brand
 //@route POST /api/v1/brands
 //@access private
-const createBrand = asyncHandler(async (req, res) => {
-  const name = req.body.name;
-  const brand = await Brand.create({ name, slug: slugify(name) });
-  res.status(201).json({ data: brand });
-});
-
+const createBrand = factory.createOne(Brand);
 //delete brand
 //@route DELETE /api/v1/brands/:id
 //@access private
-const deleteBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brand = await Brand.findByIdAndDelete(id);
-  if (!brand) {
-    return next(new apiError(`No Brand For This Id ${id}`, 404));
-  }
-  res.status(204).send();
-});
+const deleteBrand = factory.deleteOne(Brand);
 
 module.exports = {
   getBrands,

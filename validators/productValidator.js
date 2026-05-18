@@ -162,6 +162,10 @@ exports.updateProductValidator = [
     .toFloat()
     .custom(async (value, { req }) => {
       const product = await Product.findById(req.params.id);
+      body("name").custom((val, { req }) => {
+        req.body.slug = slugify(val);
+        return true;
+      });
 
       if (!product) {
         throw new Error("Product not found");

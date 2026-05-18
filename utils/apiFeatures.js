@@ -28,6 +28,7 @@ class APIFeatures {
       this.query = this.query.find({
         $or: [
           { title: { $regex: keyword, $options: "i" } },
+          { name: { $regex: keyword, $options: "i" } },
           { description: { $regex: keyword, $options: "i" } },
         ],
       });
@@ -61,12 +62,28 @@ class APIFeatures {
   }
 
   // 5) PAGINATION
-  paginate() {
+  paginate(countDocuments) {
     const page = Number(this.queryString.page) || 1;
     const limit = Number(this.queryString.limit) || 50;
     const skip = (page - 1) * limit;
 
+    const pagination = {};
+    pagination.currentPage = page;
+    pagination.limit = limit;
+    pagination.numOfPages = Math.ceil(countDocuments / limit);
+    const endIndex = page * limit;
+
+    if (endIndex < countDocuments) {
+      pagination.nextPage = page + 1;
+    }
+
+    if (skip > 0) {
+      pagination.prevPage = page - 1;
+    }
+
     this.query = this.query.skip(skip).limit(limit);
+
+    this.paginationResult = pagination;
 
     return this;
   }

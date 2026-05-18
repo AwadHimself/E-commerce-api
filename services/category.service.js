@@ -2,16 +2,27 @@ const CategoryModel = require("../models/categoryModel");
 var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const apiError = require("../utils/apiError");
+const APIFeatures = require("../utils/apiFeatures");
+const factory = require("./handlerFactory");
 
 //get list of categories
 //@route GET /api/v1/categories
 //@access Public
 const getCategories = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
-  const categories = await CategoryModel.find().skip(skip).limit(limit);
-  res.status(200).json({ results: categories.length, page, data: categories });
+  //build Query
+  const countDocuments = await CategoryModel.countDocuments();
+  const features = new APIFeatures(CategoryModel.find(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .limitFields()
+    .paginate(countDocuments);
+
+  const { query, paginationResult } = features;
+  const categories = await query;
+  res
+    .status(200)
+    .json({ results: categories.length, paginationResult, data: categories });
 });
 
 //get category by id
@@ -29,43 +40,17 @@ const getCategory = asyncHandler(async (req, res, next) => {
 //Update category by id
 //@route put /api/v1/categories/:id
 //@access private
-const updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const category = await CategoryModel.findByIdAndUpdate(
-    id,
-    {
-      name,
-      slug: slugify(name),
-    },
-    { new: true },
-  );
-  if (!category) {
-    next(new apiError(`No Category For This Id ${id}`, 404));
-  }
-  res.status(200).json({ data: category });
-});
+const updateCategory = factory.updateOne(CategoryModel);
 
 //create category
 //@route POST /api/v1/categories
 //@access private
-const createCategory = asyncHandler(async (req, res) => {
-  const name = req.body.name;
-  const category = await CategoryModel.create({ name, slug: slugify(name) });
-  res.status(201).json({ data: category });
-});
+const createCategory = factory.createOne(CategoryModel);
 
 //delete category
 //@route DELETE /api/v1/categories/:id
 //@access private
-const deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await CategoryModel.findByIdAndDelete(id);
-  if (!category) {
-    return next(new apiError(`No Category For This Id ${id}`, 404));
-  }
-  res.status(204).send();
-});
+const deleteCategory = factory.deleteOne(CategoryModel);
 
 module.exports = {
   createCategory,
