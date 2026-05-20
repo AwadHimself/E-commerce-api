@@ -19,6 +19,21 @@ const brandySchema = mongoose.Schema(
   { timestamps: true },
 );
 
+const setImageUrl = (doc) => {
+  if (doc.image) {
+    const imageUrl = `${process.env.BASE_URL}/brands/${doc.image}`;
+    doc.image = imageUrl;
+  }
+};
+
+brandySchema.post("init", (doc) => {
+  setImageUrl(doc);
+});
+
+brandySchema.post("save", (doc) => {
+  setImageUrl(doc);
+});
+
 //Create model
 const Brand = mongoose.model("Brand", brandySchema);
 

@@ -1,13 +1,34 @@
 const CategoryModel = require("../models/categoryModel");
 var slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
+const { v4: uuidv4 } = require("uuid");
+const sharp = require("sharp");
+
 const apiError = require("../utils/apiError");
 const APIFeatures = require("../utils/apiFeatures");
 const factory = require("./handlerFactory");
 
+const { uploadSingleImage } = require("../middlewares/uploadImagesMiddleware");
+
+const uploadCategoryImage = uploadSingleImage("image");
+
+const resizeCategoryImage = asyncHandler(async (req, res, next) => {
+  const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`uploads/categories/${filename}`);
+
+  req.body.image = filename;
+  next();
+});
+
 //get list of categories
 //@route GET /api/v1/categories
 //@access Public
+
 const getCategories = asyncHandler(async (req, res) => {
   //build Query
   const countDocuments = await CategoryModel.countDocuments();
@@ -58,4 +79,6 @@ module.exports = {
   getCategory,
   updateCategory,
   deleteCategory,
+  uploadCategoryImage,
+  resizeCategoryImage,
 };
