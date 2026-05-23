@@ -25,7 +25,7 @@ router.use("/:categoryId/subcategories", subCategoriesRoute);
 router
   .route("/")
   .get(getBrands)
-  .post(createBrandValidator, uploadBrandImage, resizeBrandImage, createBrand);
+  .post(uploadBrandImage, resizeBrandImage, createBrandValidator, createBrand);
 
 router
   .route("/:id")
