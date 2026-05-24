@@ -16,6 +16,7 @@ const {
   uploadCategoryImage,
   resizeCategoryImage,
 } = require("../services/category.service");
+const { protect } = require("../services/auth.service");
 
 const { param, validationResult } = require("express-validator");
 
@@ -26,6 +27,7 @@ router
   .route("/")
   .get(getCategories)
   .post(
+    protect,
     uploadCategoryImage,
     resizeCategoryImage,
     createCategoryValidator,
