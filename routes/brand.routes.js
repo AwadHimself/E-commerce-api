@@ -20,17 +20,32 @@ const {
 const { param, validationResult } = require("express-validator");
 
 const subCategoriesRoute = require("./subCategory.routes");
+const { allowedTo, protect } = require("../services/auth.service");
 router.use("/:categoryId/subcategories", subCategoriesRoute);
 
 router
   .route("/")
   .get(getBrands)
-  .post(uploadBrandImage, resizeBrandImage, createBrandValidator, createBrand);
+  .post(
+    protect,
+    allowedTo("admin", "manger"),
+    uploadBrandImage,
+    resizeBrandImage,
+    createBrandValidator,
+    createBrand,
+  );
 
 router
   .route("/:id")
   .get(getBrandValidator, getBrand)
-  .put(updateBrandValidator, uploadBrandImage, resizeBrandImage, updateBrand)
-  .delete(deleteBrandValidator, deleteBrand);
+  .put(
+    protect,
+    allowedTo("admin", "manger"),
+    updateBrandValidator,
+    uploadBrandImage,
+    resizeBrandImage,
+    updateBrand,
+  )
+  .delete(protect, allowedTo("admin"), deleteBrandValidator, deleteBrand);
 
 module.exports = router;

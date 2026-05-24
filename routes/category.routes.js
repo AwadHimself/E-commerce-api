@@ -16,7 +16,7 @@ const {
   uploadCategoryImage,
   resizeCategoryImage,
 } = require("../services/category.service");
-const { protect } = require("../services/auth.service");
+const { protect, allowedTo } = require("../services/auth.service");
 
 const { param, validationResult } = require("express-validator");
 
@@ -28,6 +28,7 @@ router
   .get(getCategories)
   .post(
     protect,
+    allowedTo("admin", "manger"),
     uploadCategoryImage,
     resizeCategoryImage,
     createCategoryValidator,
@@ -38,11 +39,14 @@ router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
   .put(
+    protect,
+    allowedTo("admin", "manger"),
+
     uploadCategoryImage,
     resizeCategoryImage,
     updateCategoryValidator,
     updateCategory,
   )
-  .delete(deleteCategoryValidator, deleteCategory);
+  .delete(protect, allowedTo("admin"), deleteCategoryValidator, deleteCategory);
 
 module.exports = router;

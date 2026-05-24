@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 //Sign Up
-//@route GET /api/v1/authsignup
+//@route GET /api/v1/auth/signup
 //@access Public
 const signUp = asyncHandler(async (req, res, next) => {
   const user = await User.create({
@@ -88,4 +88,16 @@ const protect = asyncHandler(async (req, res, next) => {
   next();
 });
 
-module.exports = { signUp, login, protect };
+//  Authorization (User Permisssions)
+const allowedTo = (...roles) => {
+  return asyncHandler(async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new apiError("You Are Not Allowed To Access This Route", 403),
+      );
+    }
+    next();
+  });
+};
+
+module.exports = { signUp, login, protect, allowedTo };

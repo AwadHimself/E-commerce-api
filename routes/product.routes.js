@@ -19,26 +19,30 @@ const {
 } = require("../services/Product.service");
 
 const { param, validationResult } = require("express-validator");
+const { protect, allowedTo } = require("../services/auth.service");
 
-router
-  .route("/")
-  .get(getProducts)
-  .post(
-    uploadProductImages,
-    resizeProductImages,
-    createProductValidator,
-    createProduct,
-  );
+router.route("/").get(getProducts).post(
+  protect,
+  allowedTo("admin", "manger"),
+
+  uploadProductImages,
+  resizeProductImages,
+  createProductValidator,
+  createProduct,
+);
 
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
   .put(
+    protect,
+    allowedTo("admin", "manger"),
+
     uploadProductImages,
     resizeProductImages,
     updateProductValidator,
     updateProduct,
   )
-  .delete(deleteProductValidator, deleteProduct);
+  .delete(protect, allowedTo("admin"), deleteProductValidator, deleteProduct);
 
 module.exports = router;

@@ -9,14 +9,16 @@ const {
 const { signUp, login } = require("../services/auth.service");
 
 const { param, validationResult } = require("express-validator");
+const {
+  forgetpassword,
+  verifyResetCode,
+  resetPassword,
+} = require("../services/forgetpassword.service");
 
 router.route("/signup").post(signUpValidator, signUp);
 router.route("/login").post(loginValidator, login);
-
-// router
-//   .route("/:id")
-//   .get(getUser)
-//   .put(uploadUserImage, resizeUserdImage, updateUserValidator, updateUser)
-//   .delete(deleteUserValidator, deleteUser);
+router.route("/forgotpassword").post(forgetpassword);
+router.route("/verifyresetcode").post(verifyResetCode);
+router.route("/resetpassword").put(resetPassword);
 
 module.exports = router;
