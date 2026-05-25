@@ -7,6 +7,8 @@ const {
   updateUserValidator,
   deleteUserValidator,
   changeUserPasswordValidator,
+  updateLoggedUserPasswordValidator,
+  updateLoggedUserValidator,
 } = require("../validators/userValidator");
 
 const {
@@ -18,6 +20,10 @@ const {
   changeUserPassword,
   uploadUserImage,
   resizeUserdImage,
+  getMe,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
+  deleteLoggedUserData,
 } = require("../services/user.service");
 
 const { param, validationResult } = require("express-validator");
@@ -29,6 +35,23 @@ router.put(
   changeUserPassword,
 );
 
+//USERS
+router.get("/getme", protect, getMe, getUser);
+router.put(
+  "/updateme",
+  protect,
+  updateLoggedUserValidator,
+  updateLoggedUserData,
+);
+router.put(
+  "/updatemypassword",
+  protect,
+  updateLoggedUserPasswordValidator,
+  updateLoggedUserPassword,
+);
+router.get("/deleteme", deleteLoggedUserData);
+
+//Admin
 router
   .route("/")
   .get(protect, allowedTo("admin"), getUsers)

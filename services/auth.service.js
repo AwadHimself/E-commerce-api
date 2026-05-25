@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const apiError = require("../utils/apiError");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const createToken = require("../utils/createToken");
 
 //Sign Up
 //@route GET /api/v1/auth/signup
@@ -15,9 +16,7 @@ const signUp = asyncHandler(async (req, res, next) => {
     password: req.body.password,
   });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE_TIME,
-  });
+  const token = createToken(user._id);
 
   res.status(201).json({ data: user, token });
 });
@@ -34,9 +33,7 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new apiError("Incorrect Email Or Password", 401));
   }
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE_TIME,
-  });
+  const token = createToken(user._id);
 
   res.status(200).json({ data: user, token });
 });

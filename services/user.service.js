@@ -9,6 +9,7 @@ const sharp = require("sharp");
 const bcrypt = require("bcryptjs");
 
 const { uploadSingleImage } = require("../middlewares/uploadImagesMiddleware");
+const createToken = require("../utils/createToken");
 
 //get list of Users
 //@route GET /api/v1/users
@@ -115,6 +116,63 @@ const resizeUserdImage = asyncHandler(async (req, res, next) => {
   next();
 });
 
+//Get Logged  user data
+//@route Get /api/v1/users/getme
+//@access protect
+const getMe = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});
+
+//Update Logged user Password
+//@route put /api/v1/users/updatemypassword
+//@access protect
+const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(),
+    },
+    {
+      new: true,
+    },
+  );
+
+  const token = createToken(user._id);
+  res.status(200).json({ data: user, token });
+});
+
+//Update Logged user Data (without password & role)
+//@route put /api/v1/users/updateme
+//@access protect
+const updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+    },
+    {
+      new: true,
+    },
+  );
+
+  res.status(200).json({ data: updatedUser });
+});
+
+//Deactivate Logged User
+//@route DELETE /api/v1/users/deleteme
+//@access protect
+const deleteLoggedUserData = asyncHandler(async (req, res, next) => {
+  const deletedUser = await User.findByIdAndUpdate(req.user._id, {
+    active: false,
+  });
+
+  res.status(204).json({ status: "success" });
+});
+
 module.exports = {
   getUsers,
   getUser,
@@ -124,4 +182,8 @@ module.exports = {
   uploadUserImage,
   resizeUserdImage,
   changeUserPassword,
+  getMe,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
+  deleteLoggedUserData,
 };
