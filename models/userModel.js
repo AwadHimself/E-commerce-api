@@ -38,6 +38,22 @@ const userSchema = mongoose.Schema(
       enum: ["user", "manger", "admin"],
       default: "user",
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Product",
+      },
+    ],
+    addresses: [
+      {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+        alias: String,
+        details: String,
+        city: String,
+        postalCode: String,
+        phone: Number,
+      },
+    ],
   },
   { timestamps: true },
 );
