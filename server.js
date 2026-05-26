@@ -15,6 +15,7 @@ const brandRoute = require("./routes/brand.routes");
 const SubCategoryRoute = require("./routes/subCategory.routes");
 const productRoutes = require("./routes/product.routes");
 const userRoutes = require("./routes/user.routes");
+const reviewRoutes = require("./routes/review.routes");
 const authRoutes = require("./routes/auth.routes");
 const globalError = require("./middlewares/errorMiddleware");
 
@@ -39,6 +40,7 @@ app.use("/api/v1/categories", CategoryRoute);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/subcategories", SubCategoryRoute);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", authRoutes);
 

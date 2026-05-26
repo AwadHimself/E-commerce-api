@@ -1,4 +1,5 @@
 const express = require("express");
+const reviweRoute = require("./review.routes");
 
 const router = express.Router();
 const {
@@ -20,6 +21,8 @@ const {
 
 const { param, validationResult } = require("express-validator");
 const { protect, allowedTo } = require("../services/auth.service");
+
+router.use("/:productId/reviews", reviweRoute);
 
 router.route("/").get(getProducts).post(
   protect,

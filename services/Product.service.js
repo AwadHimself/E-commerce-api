@@ -13,43 +13,12 @@ const { uploadMixOfImages } = require("../middlewares//uploadImagesMiddleware");
 //get list of Products
 //@route GET /api/v1/products
 //@access Public
-const getProducts = asyncHandler(async (req, res) => {
-  //build Query
-  const countDocuments = await Product.countDocuments();
-  const features = new APIFeatures(Product.find(), req.query)
-    .filter()
-    .search()
-    .sort()
-    .limitFields()
-    .paginate(countDocuments);
-
-  const { query, paginationResult } = features;
-
-  // 9) EXECUTE QUERY
-  const products = await query;
-
-  // 10) RESPONSE
-  res.status(200).json({
-    results: products.length,
-    paginationResult,
-    data: products,
-  });
-});
+const getProducts = factory.getAll(Product);
 
 //get product by id
 //@route GET /api/v1/products/:id
 //@access Public
-const getProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await Product.findById(id).populate({
-    path: "category",
-    select: "name , id",
-  });
-  if (!product) {
-    return next(new apiError(`No Product For This Id ${id}`, 404));
-  }
-  res.status(200).json({ data: product });
-});
+const getProduct = factory.getOne(Product, "reviews");
 
 //Update Product by id
 //@route put /api/v1/products/:id

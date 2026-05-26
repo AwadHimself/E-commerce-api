@@ -12,35 +12,12 @@ const { uploadSingleImage } = require("../middlewares/uploadImagesMiddleware");
 //get list of Brands
 //@route GET /api/v1/Brands
 //@access Public
-const getBrands = asyncHandler(async (req, res) => {
-  //build Query
-  const countDocuments = await Brand.countDocuments();
-  const features = new APIFeatures(Brand.find(), req.query)
-    .filter()
-    .search()
-    .sort()
-    .limitFields()
-    .paginate(countDocuments);
-
-  const { query, paginationResult } = features;
-
-  const brand = await query;
-  res
-    .status(200)
-    .json({ results: brand.length, paginationResult, data: brand });
-});
+const getBrands = factory.getAll(Brand);
 
 //get Brand by id
 //@route GET /api/v1/Brands/:id
 //@access Public
-const getBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brand = await Brand.findById(id);
-  if (!brand) {
-    return next(new apiError(`No Brand For This Id ${id}`, 404));
-  }
-  res.status(200).json({ data: brand });
-});
+const getBrand = factory.getOne(Brand);
 
 //Update Brand by id
 //@route put /api/v1/categories/:id

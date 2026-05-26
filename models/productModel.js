@@ -81,7 +81,12 @@ const productSchema = mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    //to enable virtuals
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
 
 const setImageUrl = (doc) => {
@@ -113,4 +118,11 @@ productSchema.pre(/^find/, function () {
     select: "name",
   });
 });
+
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
+});
+
 module.exports = mongoose.model("Product", productSchema);
