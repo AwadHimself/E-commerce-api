@@ -10,16 +10,9 @@ app.set("query parser", "extended");
 
 const apiError = require("./utils/apiError");
 const dbConnection = require("./config/database");
-const CategoryRoute = require("./routes/category.routes");
-const brandRoute = require("./routes/brand.routes");
-const SubCategoryRoute = require("./routes/subCategory.routes");
-const productRoutes = require("./routes/product.routes");
-const wishlistRoutes = require("./routes/wishlist.routes");
-const addressRoutes = require("./routes/adddress.routes");
-const userRoutes = require("./routes/user.routes");
-const reviewRoutes = require("./routes/review.routes");
-const authRoutes = require("./routes/auth.routes");
 const globalError = require("./middlewares/errorMiddleware");
+
+const mountRoutes = require("./routes");
 
 dbConnection();
 
@@ -34,19 +27,7 @@ if (process.env.NODE_ENV === "dev") {
 }
 
 //routes
-app.get("/", (req, res) => {
-  res.send("Our API V1");
-});
-
-app.use("/api/v1/categories", CategoryRoute);
-app.use("/api/v1/brands", brandRoute);
-app.use("/api/v1/subcategories", SubCategoryRoute);
-app.use("/api/v1/products", productRoutes);
-app.use("/api/v1/reviews", reviewRoutes);
-app.use("/api/v1/wishlist", wishlistRoutes);
-app.use("/api/v1/addresses", addressRoutes);
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/auth", authRoutes);
+mountRoutes(app);
 
 app.use((req, res, next) => {
   next(new apiError("This route is not defined", 404));
