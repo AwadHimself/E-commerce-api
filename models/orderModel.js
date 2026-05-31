@@ -26,6 +26,12 @@ var orderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    shippingAddress: {
+      details: String,
+      phone: String,
+      city: String,
+      postalCode: String,
+    },
     totalOrderPrice: {
       type: Number,
     },
@@ -34,7 +40,7 @@ var orderSchema = new mongoose.Schema(
       enum: ["card", "cash"],
       default: "cash",
     },
-    ispaid: {
+    isPaid: {
       type: Boolean,
       default: false,
     },
@@ -48,4 +54,13 @@ var orderSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+orderSchema.pre(/^find/, async function () {
+  this.populate({
+    path: "user",
+    select: "name email phone profileImage",
+  }).populate({
+    path: "cartItems.product",
+    select: "title imgCover",
+  });
+});
 module.exports = mongoose.model("Order", orderSchema);

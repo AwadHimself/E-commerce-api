@@ -9,6 +9,7 @@ const userRoutes = require("./user.routes");
 const reviewRoutes = require("./review.routes");
 const authRoutes = require("./auth.routes");
 const cartRoutes = require("./cart.routes");
+const orderRoutes = require("./oder.routes");
 
 const mountRoutes = (app) => {
   app.get("/", (req, res) => {
@@ -27,6 +28,7 @@ const mountRoutes = (app) => {
   app.use("/api/v1/users", userRoutes);
   app.use("/api/v1/auth", authRoutes);
   app.use("/api/v1/cart", cartRoutes);
+  app.use("/api/v1/orders", orderRoutes);
 };
 
 module.exports = mountRoutes;
